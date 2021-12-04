@@ -1,9 +1,12 @@
 import shutil
 import tempfile
+import time
 
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
@@ -310,3 +313,23 @@ class TaskViewTests(TestCase):
             len(response.context['page_obj']),
             user_no_follower_count_post
         )
+
+    def test_cache(self):
+        """ Проверка. Список постов на главной странице сайта
+        хранится в кэше и обновляется раз в 20 секунд."""
+        self.guest_client.get(reverse('posts:index'))
+        key = make_template_fragment_key('index_page')
+        cache_old = cache.get(key)
+        Post.objects.create(
+            author=TaskViewTests.user,
+            text='Временный пост для кэш',
+        )
+        self.guest_client.get(reverse('posts:index'))
+        key_new = make_template_fragment_key('index_page')
+        cache_new = cache.get(key_new)
+        self.assertEqual(cache_old, cache_new)
+        time.sleep(20)
+        self.guest_client.get(reverse('posts:index'))
+        key_new = make_template_fragment_key('index_page')
+        cache_new = cache.get(key_new)
+        self.assertNotEqual(cache_old, cache_new)
