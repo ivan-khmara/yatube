@@ -121,9 +121,8 @@ def add_comment(request, post_id):
 def follow_index(request):
     template = 'posts/follow.html'
     user = request.user
-    followers = user.follower.all()
     post_list = Post.objects.filter(
-        author__in=[follow.author for follow in followers]
+        author__following__user=user
     )
     page_obj = my_paginator(request, post_list)
     context = {
@@ -136,12 +135,11 @@ def follow_index(request):
 def profile_follow(request, username):
     """Подписаться на автора"""
     author = get_object_or_404(User, username=username)
-    if not Follow.objects.filter(user=request.user, author=author).exists():
-        if request.user != author:
-            Follow.objects.create(
-                user=request.user,
-                author=author,
-            )
+    if request.user != author:
+        Follow.objects.get_or_create(
+            user=request.user,
+            author=author,
+        )
     return redirect('posts:profile', username)
 
 

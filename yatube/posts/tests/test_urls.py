@@ -12,6 +12,7 @@ class TaskURLTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
+        cls.author = User.objects.create_user(username='author')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='group_test',
@@ -32,13 +33,20 @@ class TaskURLTests(TestCase):
     def test_status_code_authorized_client(self):
         """Проверка: доступность страниц для авторизированного пользователя"""
         url_names_status_code_authorized_client = {
-            '/': 200,
+            '/': HTTPStatus.OK,
             f'/group/{TaskURLTests.group.slug}/': HTTPStatus.OK,
             f'/profile/{TaskURLTests.user.username}/': HTTPStatus.OK,
             f'/posts/{int(TaskURLTests.post.id)}/': HTTPStatus.OK,
             f'/posts/{int(TaskURLTests.post.id)}/edit/': HTTPStatus.OK,
             '/create/': HTTPStatus.OK,
-            '/unexisting_page/': HTTPStatus.NOT_FOUND
+            '/unexisting_page/': HTTPStatus.NOT_FOUND,
+            '/follow/': HTTPStatus.OK,
+            f'/posts/{int(TaskURLTests.post.id)}/comment/':
+                HTTPStatus.FOUND,
+            f'/profile/{TaskURLTests.author.username}/follow/':
+                HTTPStatus.FOUND,
+            f'/profile/{TaskURLTests.author.username}/unfollow/':
+                HTTPStatus.FOUND,
         }
         for url, code in url_names_status_code_authorized_client.items():
             with self.subTest(code=code):
@@ -48,13 +56,20 @@ class TaskURLTests(TestCase):
     def test_status_code_guest_client(self):
         """Проверка: доступность страниц для гостя"""
         url_names_status_code_guest_client = {
-            '/': 200,
+            '/': HTTPStatus.OK,
             f'/group/{TaskURLTests.group.slug}/': HTTPStatus.OK,
             f'/profile/{TaskURLTests.user.username}/': HTTPStatus.OK,
             f'/posts/{int(TaskURLTests.post.id)}/': HTTPStatus.OK,
             f'/posts/{int(TaskURLTests.post.id)}/edit/': HTTPStatus.FOUND,
             '/create/': HTTPStatus.FOUND,
-            '/unexisting_page/': HTTPStatus.NOT_FOUND
+            '/unexisting_page/': HTTPStatus.NOT_FOUND,
+            '/follow/': HTTPStatus.FOUND,
+            f'/posts/{int(TaskURLTests.post.id)}/comment/':
+                HTTPStatus.FOUND,
+            f'/profile/{TaskURLTests.author.username}/follow/':
+                HTTPStatus.FOUND,
+            f'/profile/{TaskURLTests.author.username}/unfollow/':
+                HTTPStatus.FOUND,
         }
         for url, code in url_names_status_code_guest_client.items():
             with self.subTest(code=code):
@@ -71,6 +86,7 @@ class TaskURLTests(TestCase):
             f'/posts/{int(TaskURLTests.post.id)}/edit/':
                 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
+            '/follow/': 'posts/follow.html',
         }
         for url, template in templates_url_names.items():
             with self.subTest(url=url):

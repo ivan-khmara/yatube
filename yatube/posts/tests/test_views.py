@@ -68,6 +68,7 @@ class TaskViewTests(TestCase):
             reverse('posts:post_edit', args=[int(TaskViewTests.post.id)]):
                 'posts/create_post.html',
             reverse('posts:post_create'): 'posts/create_post.html',
+            reverse('posts:follow_index'): 'posts/follow.html',
         }
         for reverse_name, template in templates_url_names_authorized.items():
             with self.subTest(reverse_name=reverse_name):
@@ -251,9 +252,9 @@ class TaskViewTests(TestCase):
         self.assertEqual(response.context.get('post').id, post_new.id)
         self.assertEqual(response.context.get('post').image, post_new.image)
 
-    def test_follow_unfollow(self):
+    def test_follow(self):
         """ Проверка: Авторизованный пользователь может подписываться
-        на других пользователей и удалять их из подписок."""
+        на других пользователей."""
         user_author = TaskViewTests.user
         user_authorized = TaskViewTests.user_authorized
         count_following = user_author.following.all().count()
@@ -270,66 +271,83 @@ class TaskViewTests(TestCase):
             user_authorized.follower.all().count(),
             count_follower + 1
         )
+
+    def test_unfollow(self):
+        """ Проверка: Авторизованный пользователь может удалять
+        других пользователей из подписок."""
+        user_author = TaskViewTests.user
+        user_authorized = TaskViewTests.user_authorized
+        Follow.objects.create(user=user_authorized, author=user_author)
+        count_following = user_author.following.all().count()
+        count_follower = user_authorized.follower.all().count()
         self.authorized_client.get(reverse(
             'posts:profile_unfollow',
             args=[user_author.username])
         )
         self.assertEqual(
             user_author.following.all().count(),
-            count_following
+            count_following - 1
         )
         self.assertEqual(
             user_authorized.follower.all().count(),
-            count_follower
+            count_follower - 1
+        )
+
+    def test_unfollow_index(self):
+        """ Проверка: Новая запись пользователя не появляется в ленте тех,
+        кто на него не подписан."""
+        author = User.objects.create_user(username='author')
+        response = self.authorized_client.get(reverse('posts:follow_index'))
+        user_unfollower_count_post = len(response.context['page_obj'])
+        Post.objects.create(
+            author=author,
+            text='Временный пост для подписок',
+        )
+        response = self.authorized_client.get(reverse('posts:follow_index'))
+        self.assertEqual(
+            len(response.context['page_obj']),
+            user_unfollower_count_post
         )
 
     def test_follow_index(self):
-        """ Проверка: Новая запись пользователя появляется в ленте тех, кто
-        на него подписан и не появляется в ленте тех, кто не подписан."""
-        user_no_follower = TaskViewTests.user
+        """ Проверка: Новая запись пользователя появляется в ленте тех,
+        кто на него подписан."""
         user_follower = TaskViewTests.user_authorized
-        user = User.objects.create_user(username='test')
-        Follow.objects.create(user=user_follower, author=user)
-        self.authorized_client.force_login(user_follower)
+        author = User.objects.create_user(username='author')
+        Follow.objects.create(user=user_follower, author=author)
         response = self.authorized_client.get(reverse('posts:follow_index'))
         user_follower_count_post = len(response.context['page_obj'])
-        self.authorized_client.force_login(user_no_follower)
-        response = self.authorized_client.get(reverse('posts:follow_index'))
-        user_no_follower_count_post = len(response.context['page_obj'])
         post_new = Post.objects.create(
-            author=user,
+            author=author,
             text='Временный пост для подписок',
         )
-        self.authorized_client.force_login(user_follower)
         response = self.authorized_client.get(reverse('posts:follow_index'))
         self.assertEqual(
             len(response.context['page_obj']),
             user_follower_count_post + 1
         )
         self.assertEqual(response.context['page_obj'][0].text, post_new.text)
-        self.authorized_client.force_login(user_no_follower)
-        response = self.authorized_client.get(reverse('posts:follow_index'))
         self.assertEqual(
-            len(response.context['page_obj']),
-            user_no_follower_count_post
+            response.context['page_obj'][0].author,
+            post_new.author
         )
 
     def test_cache(self):
         """ Проверка. Список постов на главной странице сайта
         хранится в кэше и обновляется раз в 20 секунд."""
         self.guest_client.get(reverse('posts:index'))
-        key = make_template_fragment_key('index_page')
+        key = make_template_fragment_key('index_page', '1')
         cache_old = cache.get(key)
         Post.objects.create(
             author=TaskViewTests.user,
             text='Временный пост для кэш',
         )
         self.guest_client.get(reverse('posts:index'))
-        key_new = make_template_fragment_key('index_page')
+        key_new = make_template_fragment_key('index_page', '1')
         cache_new = cache.get(key_new)
         self.assertEqual(cache_old, cache_new)
         time.sleep(20)
         self.guest_client.get(reverse('posts:index'))
-        key_new = make_template_fragment_key('index_page')
+        key_new = make_template_fragment_key('index_page', '1')
         cache_new = cache.get(key_new)
         self.assertNotEqual(cache_old, cache_new)

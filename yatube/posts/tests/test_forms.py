@@ -75,7 +75,7 @@ class TaskFormTests(TestCase):
             reverse('posts:profile', args=[TaskFormTests.user.username])
         )
         self.assertEqual(Post.objects.count(), post_count_start + 1)
-        post = Post.objects.latest("pub_date")
+        post = Post.objects.latest('pub_date')
         self.assertEqual(post.text, form_data['text'])
         self.assertEqual(post.group.id, form_data['group'])
         self.assertEqual(post.author, form_data['author'])
