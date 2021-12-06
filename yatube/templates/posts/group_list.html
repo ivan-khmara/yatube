@@ -11,7 +11,7 @@
   <p> {{ group.description }} </p>
 
   {% for post in page_obj %}
-    {% include 'includes/post.html' %}
+    {% include 'posts/includes/post.html' %}
     {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}
 
