@@ -25,14 +25,13 @@ SECRET_KEY = '9nrlkrtz(fqko5i7ui6$$yvp^n=)5b*gaalc@cv5p#b^6-^9ur'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-#    'www.ivanpaktikum2020.pythonanywhere.com',
-#    'ivanpaktikum2020.pythonanywhere.com',
-#    '127.0.0.1',
-#    'localhost',
-#    'testserver'
-'*'
-]
+# 'www.ivanpaktikum2020.pythonanywhere.com',
+# 'ivanpaktikum2020.pythonanywhere.com',
+# '127.0.0.1',
+# 'localhost',
+# 'testserver'
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -63,7 +62,7 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-#INTERNAL_IPS = ['127.0.0.1',]
+# INTERNAL_IPS = ['127.0.0.1',]
 
 ROOT_URLCONF = 'yatube.urls'
 
@@ -136,7 +135,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 
@@ -161,6 +160,3 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
-
-
-
