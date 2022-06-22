@@ -23,14 +23,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9nrlkrtz(fqko5i7ui6$$yvp^n=)5b*gaalc@cv5p#b^6-^9ur'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
-    'www.ivanpaktikum2020.pythonanywhere.com',
-    'ivanpaktikum2020.pythonanywhere.com',
-    '127.0.0.1',
-    'localhost',
-    'testserver'
+#    'www.ivanpaktikum2020.pythonanywhere.com',
+#    'ivanpaktikum2020.pythonanywhere.com',
+#    '127.0.0.1',
+#    'localhost',
+#    'testserver'
+'*'
 ]
 
 
@@ -62,9 +63,7 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+#INTERNAL_IPS = ['127.0.0.1',]
 
 ROOT_URLCONF = 'yatube.urls'
 
@@ -135,9 +134,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+STATIC_URL = '/static/'
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+
 
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'posts:index'
@@ -153,7 +154,6 @@ COUNT_POSTS_PAGE = 10
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CACHES = {
@@ -161,3 +161,6 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+
+

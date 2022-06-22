@@ -1,4 +1,4 @@
-name: Build and Test
+name: Test
 
 on:
   push:
@@ -7,46 +7,36 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
-    #if: ${{ github.repository == 'yandex-praktikum/hw05_final' }}
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8, 3.9]
+
     steps:
+    - name: Clone repo
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        # Выбор версии Python
+        python-version: 3.7
+
     - name: Install dependencies
       run: |
+        # обновление pip
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Git Clone Action
-      uses: actions/checkout@v2
-      with:
-        repository: ${{ secrets.repository }}
-        ssh-key: ${{ secrets.ACCESS_TOKEN }}
-        path: yatube/
-    - name: Lint with flake8 author
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 yatube --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings
-        flake8 yatube --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics --config=setup.cfg
-    - name: Lint with flake8 tests
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 tests --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings
-        flake8 tests --count --exit-zero --max-complexity=10 --max-line-length=79 --statistics
-    - name: Test with pytest
+        # установка flake8 и его плагинов
+        pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
+        # установка зависимостей
+        pip install -r yatube/requirements.txt
+
+    - name: Test with flake8 and django tests
       env:
         SECRET_KEY: "5UP3R-53CR3T-K3Y-FR0M-TurboKach"
         DJANGO_SETTINGS_MODULE: yatube.settings
         DEBUG: 1
         ALLOWED_HOSTS: "*"
       run: |
-        py.test
+        # запуск проверки проекта по flake8
+        python -m flake8
+        # запуск pytest
+        python -m pytest
