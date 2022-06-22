@@ -36,10 +36,6 @@ jobs:
 
 
     - name: Test with pytest
-      env:
-        SECRET_KEY: "5UP3R-53CR3T-K3Y-FR0M-TurboKach"
-        DJANGO_SETTINGS_MODULE: yatube.settings
-        DEBUG: 1
-        ALLOWED_HOSTS: "*"
       run: |
-        py.test
+        # запуск проверки проекта по pytest
+        python -m pytest
