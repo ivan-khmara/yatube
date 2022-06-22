@@ -1,5 +1,4 @@
-# YaTube
-## Платформа для ведения онлайн-дневников
+# YaTube - социальная сеть для публикации дневников
 Status of Last test:<br>
 <img src="https://github.com/ivan-khmara/yatube/actions/workflows/python-app.yml/badge.svg"><br>
 ## Описание
@@ -17,7 +16,7 @@ $ docker run -d -p 80:8000 yatube
 + Python 3
 + Django 2.2
 + SQLite3
-+ pytest
++ unittest
 + GitHub Actions
 + Docker
 
