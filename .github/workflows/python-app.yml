@@ -34,12 +34,12 @@ jobs:
         # запуск проверки проекта по flake8
         python -m flake8
 
-    - name: Test with pytest
-      run: |
-        # запуск проверки проекта по pytest
-        python -m pytest
+    # - name: Test with pytest
+    #   run: |
+    #     # запуск проверки проекта по pytest
+    #     python -m pytest
 
-    - name: Test with pytest
+    - name: Test with test
       run: |
         # запуск проверки проекта по pytest
         cd yatube

@@ -149,3 +149,6 @@ dmypy.json
 #static/
 yatube/posts/static/
 yatube/media/
+
+# test yandex.praktikum
+tests
