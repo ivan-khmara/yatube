@@ -10,6 +10,7 @@ from django.core.cache.utils import make_template_fragment_key
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+
 from yatube.settings import COUNT_POSTS_PAGE as CPP
 
 from ..models import Follow, Group, Post

@@ -30,11 +30,6 @@ jobs:
         pip install -r yatube/requirements.txt
 
     - name: Test with flake8 and django tests
-      env:
-        SECRET_KEY: "5UP3R-53CR3T-K3Y-FR0M-TurboKach"
-        DJANGO_SETTINGS_MODULE: yatube.settings
-        DEBUG: 1
-        ALLOWED_HOSTS: "*"
       run: |
         # запуск проверки проекта по flake8
         python -m flake8
